@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>אתונה | דצמבר 2025</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ==================== UI VARIABLES ==================== */
+        :root {
+            --primary: #2c5282;
+            --primary-light: #ebf8ff;
+            --accent: #ed8936;
+            --art: #553C9A;
+            --text: #2d3748;
+            --text-light: #4A5568;
+            --bg: #f7fafc;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --sat: env(safe-area-inset-top);
+            --sab: env(safe-area-inset-bottom);
+        }
+
+        /* --- תיקונים קריטיים ל-IOS --- */
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; /* ביטול הבהוב אפור בלחיצה */
+            margin: 0; padding: 0; 
+        }
+        
+        /* הופך את כל האלמנטים הלחיצים לברורים עבור האייפון */
+        button, .nav-btn, .accordion-header, .btn-small, .list-item {
+            cursor: pointer;
+            touch-action: manipulation; /* מונע זום בלחיצה כפולה ומזרז תגובה */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: calc(90px + var(--sab)); 
+            line-height: 1.6;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* ==================== HEADER ==================== */
+        header {
+            background: var(--white);
+            padding: calc(15px + var(--sat)) 20px 15px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        h1 { font-size: 1.3rem; color: var(--primary); font-weight: 800; margin-bottom: 4px; }
+        .subtitle { font-size: 0.9rem; color: var(--text-light); }
+        .dates-badge { 
+            display: inline-block; background: var(--primary-light); color: var(--primary); 
+            font-size: 0.8rem; padding: 4px 12px; border-radius: 20px; font-weight: bold; margin-top: 8px;
+        }
+
+        /* ==================== SEARCH ==================== */
+        .search-box { padding: 0 20px; margin-top: -20px; z-index: 101; position: relative; }
+        .search-input {
+            width: 100%; padding: 12px 20px; border-radius: 50px; border: 1px solid #e2e8f0;
+            box-shadow: var(--shadow); font-size: 16px; outline: none; transition: 0.2s;
+            appearance: none;
+        }
+        .search-input:focus { border-color: var(--primary); }
+
+        /* ==================== SECTIONS & CARDS ==================== */
+        .section { display: none; padding: 20px; animation: fadeIn 0.2s ease-out; }
+        .section.active { display: block; }
+        
+        .section-title { 
+            font-size: 1.2rem; font-weight: 700; color: var(--primary); 
+            margin: 20px 0 15px 0; display: flex; align-items: center; gap: 8px;
+        }
+
+        .card {
+            background: var(--white); border-radius: var(--radius);
+            box-shadow: var(--shadow); margin-bottom: 15px; overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        /* ==================== ACCORDION ==================== */
+        .accordion-header {
+            padding: 18px 20px; display: flex; justify-content: space-between;
+            align-items: center; font-weight: 600; color: var(--text); transition: 0.2s;
+            background: white; /* חשוב לאייפון */
+        }
+        .accordion-header:active { background: var(--primary-light); }
+        .accordion-content { display: none; padding: 0 20px 20px 20px; border-top: 1px solid #f0f0f0; }
+        .accordion-content.open { display: block; }
+        
+        .toggle-icon { font-size: 0.8rem; color: var(--text-light); transition: transform 0.3s; }
+        .rotate { transform: rotate(180deg); }
+
+        /* Timeline Design */
+        .timeline-item {
+            padding: 15px 0; border-bottom: 1px dashed #e2e8f0; position: relative;
+        }
+        .time { 
+            font-size: 0.75rem; font-weight: bold; color: var(--primary); 
+            background: var(--primary-light); padding: 2px 8px; border-radius: 6px; 
+        }
+        .activity { font-weight: 700; margin-top: 5px; display: block; }
+        .desc { font-size: 0.9rem; color: var(--text-light); margin-top: 2px; }
+
+        /* ==================== LIST ITEMS & DETAILS ==================== */
+        .list-item { padding: 20px; border-bottom: 1px solid #f0f0f0; }
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .place-name { font-weight: 700; font-size: 1.1rem; color: var(--text); }
+        
+        .place-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; background: #edf2f7; color: var(--text-light); white-space: nowrap; font-weight: 600;}
+        .tag-teen { background: #c6f6d5; color: #22543d; } 
+        .tag-must { background: #fed7d7; color: #822727; }
+        .tag-art { background: #E9D8FD; color: #553C9A; } 
+        .tag-food { background: #FEEBC8; color: #7B341E; } 
+        
+        .info-text {
+            font-size: 0.95rem; color: #4a5568; line-height: 1.6; margin-bottom: 12px;
+        }
+        .info-text p { margin-bottom: 8px; } 
+        
+        /* Food Recommendation Specific */
+        .food-rec-box {
+            background: #fff7ed; border: 1px solid #ffedd5; padding: 10px; border-radius: 8px;
+            font-size: 0.9rem; color: #7c2d12; margin-top: 10px;
+        }
+        .food-rec-box b { color: #c2410c; }
+
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; background: #f8f9fa; padding: 10px; border-radius: 8px; }
+        .meta-item { font-size: 0.85rem; }
+        .meta-item b { color: var(--primary); display: block; font-size: 0.75rem; }
+
+        .btn-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-small {
+            flex: 1; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.9rem;
+            text-decoration: none; font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .btn-nav { background: var(--primary-light); color: var(--primary); }
+        .btn-web { background: #f0fff4; color: #276749; }
+        .btn-art { background: #F3E8FF; color: #553C9A; border: 1px solid #E9D8FD; }
+
+        /* ==================== GRAFFITI SPECIFIC ==================== */
+        .graffiti-intro {
+            padding: 20px; background: #F3E8FF; color: #2D3748;
+            border-bottom: 1px solid #E9D8FD; font-size: 0.95rem; line-height: 1.7;
+        }
+        .graffiti-step {
+            padding: 20px; border-left: 4px solid var(--art); margin-bottom: 0;
+            background: #fff; border-bottom: 1px solid #eee;
+        }
+        .step-num { 
+            font-size: 0.7rem; font-weight: 800; color: var(--art); text-transform: uppercase; letter-spacing: 1px;
+        }
+        .graffiti-title { font-weight: 800; font-size: 1.1rem; margin: 5px 0; color: var(--text); }
+        .graffiti-text { font-size: 0.95rem; color: #4a5568; line-height: 1.7; margin-bottom: 10px; text-align: justify; }
+        
+        .food-spot {
+            background: #FFFBF0; border: 1px solid #FEEBC8; padding: 12px; border-radius: 8px;
+            margin-top: 10px; font-size: 0.9rem; color: #744210;
+        }
+        .food-spot b { color: #C05621; display:block; margin-bottom:3px; }
+
+        /* ==================== TIPS LIST ==================== */
+        .tip-list { list-style: none; }
+        .tip-list li { margin-bottom: 10px; position: relative; padding-right: 15px; font-size: 0.95rem; }
+        .tip-list li::before { content: "•"; color: var(--accent); font-weight: bold; position: absolute; right: 0; }
+        .tip-highlight { font-weight: 600; color: var(--primary); }
+
+        /* ==================== GRAPH STYLES ==================== */
+        .chart-container { 
+            padding: 15px; 
+            background: white; 
+            border-radius: var(--radius); 
+            margin-top: 20px; 
+            border: 1px solid #eee;
+            height: 260px; 
+            position: relative;
+            width: 100%;
+        }
+
+        /* ==================== NAVBAR ==================== */
+        .navbar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(255,255,255,0.98); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around; 
+            padding: 10px 0 calc(10px + var(--sab)) 0;
+            border-top: 1px solid rgba(0,0,0,0.05); z-index: 200;
+        }
+        .nav-btn {
+            background: none; border: none; font-family: inherit;
+            display: flex; flex-direction: column; align-items: center;
+            color: #a0aec0; font-size: 0.65rem; font-weight: 600; flex: 1; 
+            padding: 0 2px;
+            cursor: pointer;
+            /* חשוב לאייפון: */
+            -webkit-appearance: none; 
+        }
+        .nav-btn.active { color: var(--primary); }
+        .nav-icon { font-size: 1.3rem; margin-bottom: 3px; pointer-events: none; /* שהלחיצה תהיה על הכפתור */ }
+        .nav-btn span { pointer-events: none; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>אתונה 2025</h1>
+    <div class="subtitle">המדריך למשפחה | Voulis 15</div>
+    <div class="dates-badge">4-8 בדצמבר</div>
+</header>
+
+<div class="search-box">
+    <input type="text" class="search-input" id="searchInput" placeholder="חפש מסעדה, טיפ או אתר...">
+</div>
+
+<div id="schedule" class="section active">
+    <div class="section-title">📅 מסלול הטיול</div>
+
+    <div class="card filter-item">
+        <div class="accordion-header">
+            <span>חמישי 4/12: נחיתה ואווירה</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="accordion-content open">
+            <div class="timeline-item">
+                <span class="time">16:00</span>
+                <span class="activity">הגעה למלון (Voulis 15)</span>
+                <span class="desc">מונית (כ-45€) או מטרו קו כחול לסינטגמה. התארגנות.</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">18:00</span>
+                <span class="activity">סינטגמה וארמו</span>
+                <span class="desc">עץ האשוח בכיכר, משמר הפרלמנט ומדרחוב הקניות.</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">20:00</span>
+                <span class="activity">ערב ב-Psiri</span>
+                <span class="desc">חובה: צילום בקפה Little Kook המקושט וארוחת ערב בשכונה.</span>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/dir/Voulis+15,+Athina+105+63/Syntagma+Square,+Athens/Ermou,+Athens/Psiri,+Athens/Little+Kook,+Karaiskaki+17,+Athina" target="_blank" class="btn-small btn-nav">🗺️ מסלול הליכה מלא ליום ה'</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card filter-item">
+        <div class="accordion-header">
+            <span>שישי 5/12: טכנולוגיה ושווקים</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+            <div class="timeline-item">
+                <span class="time">10:00</span>
+                <span class="activity">מוזיאון Kotsanas</span>
+                <span class="desc">רובוטים והמצאות עתיקות. (קולונקי).</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">12:00</span>
+                <span class="activity">השוק המרכזי ומונסטיראקי</span>
+                <span class="desc">שוק האוכל, כיכר מונסטיראקי ושוק הפשפשים.</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">15:00</span>
+                <span class="activity">הגן הלאומי וזאפיו</span>
+                <span class="desc">טיול רגוע בפארק הירוק במרכז העיר.</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">19:00</span>
+                <span class="activity">מוזיאון האשליות</span>
+                <span class="desc">פעילות ערב כיפית ומקורה (Museum of Illusions).</span>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Kotsanas+Museum+of+Ancient+Greek+Technology/Varvakios+Agora/Monastiraki+Square/National+Garden/Zappeion/Museum+of+Illusions+Athens" target="_blank" class="btn-small btn-nav">🗺️ מסלול הליכה מלא ליום ו'</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card filter-item">
+        <div class="accordion-header">
+            <span>שבת 6/12: פלאקה ונופים</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+            <div class="timeline-item">
+                <span class="time">09:30</span>
+                <span class="activity">פלאקה ואנפיוטיקה</span>
+                <span class="desc">שיטוט בסמטאות הציוריות. חובה להגיע לשכונת אנפיוטיקה הגבוהה.</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">12:00</span>
+                <span class="activity">גבעת ליקאביטוס</span>
+                <span class="desc">תצפית 360 מעלות על העיר (עלייה ברכבל).</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">18:30</span>
+                <span class="activity">מרכז SNFCC</span>
+                <span class="desc">כריסטמס, מזרקות ואורות במרכז התרבות המודרני.</span>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Plaka,+Athens/Anafiotika,+Athens/Teleferik+Lycabettus/Stavros+Niarchos+Foundation+Cultural+Center" target="_blank" class="btn-small btn-nav">🗺️ מסלול הליכה + נסיעה ליום ש'</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card filter-item">
+        <div class="accordion-header">
+            <span>ראשון 7/12: היסטוריה (חינם)</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+            <div class="timeline-item">
+                <span class="time">08:00</span>
+                <span class="activity">האקרופוליס</span>
+                <span class="desc">כניסה חינם! הגעה מוקדמת חובה.</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">11:00</span>
+                <span class="activity">טקס בסינטגמה</span>
+                <span class="desc">המצעד החגיגי המלא של החיילים.</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">12:00</span>
+                <span class="activity">מוזיאון האקרופוליס</span>
+                <span class="desc">המוזיאון המודרני למרגלות ההר.</span>
+            </div>
+            <div class="timeline-item">
+                <span class="time">15:00</span>
+                <span class="activity">שוק הפשפשים</span>
+                <span class="desc">יום א' הוא היום החזק והססגוני ביותר בשוק.</span>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Acropolis+of+Athens/Syntagma+Square/Acropolis+Museum/Monastiraki+Flea+Market" target="_blank" class="btn-small btn-nav">🗺️ מסלול הליכה מלא ליום א'</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3 style="margin:0 0 5px 0; color:var(--primary); font-size:0.95rem; text-align:center;">📊 ק"מ הליכה משוער ליום</h3>
+        <div style="height: 200px; width: 100%;">
+            <canvas id="walkingChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div id="attractions" class="section">
+    <div class="section-title">🎡 אטרקציות ואתרים</div>
+
+    <div class="card filter-item">
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">האקרופוליס (The Acropolis)</span>
+                <span class="place-tag tag-must">חובה</span>
+            </div>
+            <div class="info-text">
+                <p>זהו האתר המזוהה ביותר עם יוון העתיקה והסמל של העיר. האקרופוליס ("העיר העליונה") היא גבעה מבוצרת שבמרכזה עומד <b>הפרתנון</b> - מקדש עצום שהוקדש לאלה אתנה. עוד באתר תראו את ה"ארכטיון" עם מרפסת הקריאטידות (פסלי נשים המחזיקות את הגג) ואת תיאטרון הורדוס אטיקוס שבו מתקיימות הופעות עד היום.</p>
+                <p>העלייה לפסגה דורשת הליכה, אך הנוף הנשקף מלמעלה עוצר נשימה וחולש על כל אתונה עד הים. ביקור באתונה אינו שלם בלי תמונה מול הפרתנון. שימו לב: ביום ראשון הראשון של החודש (7/12) הכניסה חינם, אך צפוי להיות עמוס.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>08:00-17:00</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>08:00 בדיוק</div>
+                <div class="meta-item"><b>⏳ זמן</b>2-3 שעות</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://hhticket.gr/" target="_blank" class="btn-small btn-web">🎟️ כרטיסים</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=Acropolis+of+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">מוזיאון האשליות</span>
+                <span class="place-tag tag-teen">נוער</span>
+            </div>
+            <div class="info-text">
+                <p>מוזיאון אינטראקטיבי, קליל ומהנה במיוחד, הממוקם בלב שכונת מונסטיראקי. המקום מציע עשרות מיצגים של אשליות אופטיות, הולוגרמות וחדרים שבהם חוקי הפיזיקה נראים כאילו השתבשו.</p>
+                <p>זהו גן עדן לאינסטגרם ולצילום תמונות משעשעות: חדרים הפוכים, חדר הגמדים והענקים, וראש מונח על מגש. חוויה מצוינת לשבירת שגרה של עתיקות והיסטוריה, ומתאימה מאוד לבילוי ערב או כמחסה מגשם.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>10:00-21:00</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>שעות הערב</div>
+                <div class="meta-item"><b>⏳ זמן</b>כ-60 דקות</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/?api=1&query=Museum+of+Illusions+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">מרכז סטברוס ניארכוס (SNFCC)</span>
+                <span class="place-tag">כריסטמס</span>
+            </div>
+            <div class="info-text">
+                <p>פלא אדריכלי מודרני שתוכנן על ידי האדריכל רנצו פיאנו. המתחם הענק כולל את הספרייה הלאומית החדשה, בית האופרה הלאומי ופארק ירוק עצום המשתרע עד הים. אפשר לעלות למרפסת התצפית "המגדלור" לתצפית פנורמית.</p>
+                <p>בחודש דצמבר המקום הופך לקסום במיוחד: התעלה המלאכותית מוארת באורות חג, יש מופעי מזרקות "רוקדות" לצלילי מוזיקה, ומוקם משטח החלקה על הקרח ענק. האווירה חגיגית, מודרנית ומרשימה מאוד.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>פארק עד חצות</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>אחרי שקיעה</div>
+                <div class="meta-item"><b>⏳ זמן</b>2-3 שעות</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/?api=1&query=Stavros+Niarchos+Foundation+Cultural+Center" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">מוזיאון טכנולוגיה Kotsanas</span>
+                <span class="place-tag">מדע</span>
+            </div>
+            <div class="info-text">
+                <p>פנינה נסתרת בשכונת קולונקי. המוזיאון מציג דגמים עובדים (משוחזרים) של המצאות מדהימות מיוון העתיקה, שמוכיחות עד כמה הם היו מתקדמים.</p>
+                <p>תראו כאן את הרובוט המשרת הראשון בהיסטוריה, שעונים מעוררים הידראוליים, דלתות מקדש אוטומטיות ומנגנון אנטיקיתרה (המחשב הראשון). רוב המוצגים אינטראקטיביים וניתן להפעיל אותם.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>09:00-17:00</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>בוקר/גשם</div>
+                <div class="meta-item"><b>⏳ זמן</b>כ-60 דקות</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/?api=1&query=Museum+of+Ancient+Greek+Technology" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">המוזיאון הארכיאולוגי הלאומי</span>
+                <span class="place-tag">היסטוריה</span>
+            </div>
+            <div class="info-text">
+                <p>זהו המוזיאון הגדול והחשוב ביותר ביוון, ואחד החשובים בעולם. הוא מכיל את האוסף המקיף ביותר של עתיקות יווניות, מהתקופה הפרהיסטורית ועד התקופה הרומית.</p>
+                <p>פריטי החובה כוללים את <b>מסכת הזהב של אגממנון</b> המפורסמת, פסל ברונזה של פוסידון/זאוס, והמקור של <b>מנגנון אנטיקיתרה</b>. המוזיאון עצום בגודלו.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>08:30-15:30</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>מוקדם בבוקר</div>
+                <div class="meta-item"><b>⏳ זמן</b>2-3 שעות</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/?api=1&query=National+Archaeological+Museum+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">אצטדיון פנאתנאייקו</span>
+                <span class="place-tag">ספורט</span>
+            </div>
+            <div class="info-text">
+                <p>זהו האצטדיון היחיד בעולם הבנוי כולו משיש לבן ("קלימארמרו"). האתר עומד על שרידיו של אצטדיון עתיק, ושוחזר כדי לארח את המשחקים האולימפיים המודרניים הראשונים ב-1896.</p>
+                <p>אפשר לרוץ על המסלול כמו האצנים האולימפיים, להצטלם על הפודיום, ולטפס במעלה המדרגות לתצפית יפה על העיר.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>08:00-17:00</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>בוקר שמש</div>
+                <div class="meta-item"><b>⏳ זמן</b>45 דקות</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/?api=1&query=Panathenaic+Stadium" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">גבעת פילופאפוס</span>
+                <span class="place-tag">טבע</span>
+            </div>
+            <div class="info-text">
+                <p>פארק טבע יפהפה מדרום-מערב לאקרופוליס. הגבעה מציעה שבילי הליכה מוצלים, צמחייה ים-תיכונית ושקט יחסי מהעיר הסואנת.</p>
+                <p>הסיבה העיקרית להגיע לכאן היא <b>התצפית</b>. מכאן מתקבלת הזווית הטובה ביותר לצילום האקרופוליס (בגובה העיניים ולא מלמטה), וביום בהיר רואים את הים.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>פתוח תמיד</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>שקיעה</div>
+                <div class="meta-item"><b>⏳ זמן</b>1-1.5 שעות</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/?api=1&query=Philopappos+Hill" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">קרמיקוס (Kerameikos)</span>
+                <span class="place-tag">עתיקות</span>
+            </div>
+            <div class="info-text">
+                <p>אחד האתרים המרתקים והפחות מוכרים באתונה. זהו בית הקברות העתיק של העיר, ששימש במשך כ-1,000 שנים. האתר שקט, ירוק ופסטורלי.</p>
+                <p>באתר יש גם מוזיאון קטן ומצוין המציג את הממצאים מהקברים. השם "קרמיקוס" מגיע משכונת הקדרים שהייתה כאן.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>08:00-17:00</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>בוקר</div>
+                <div class="meta-item"><b>⏳ זמן</b>1 שעה</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/?api=1&query=Kerameikos" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">מוזיאון הרכב ההלני</span>
+                <span class="place-tag">רכב</span>
+            </div>
+            <div class="info-text">
+                <p>אוסף פרטי מרשים המתפרס על פני 3 קומות בבניין מודרני. המוזיאון מציג את האבולוציה של הרכב דרך יותר מ-100 מכוניות עתיקות, נדירות וקלאסיות.</p>
+                <p>תמצאו כאן הכל, החל ממכוניות משנות ה-20 ועד מכוניות ספורט ויוקרה. חוויה נהדרת לנערים ולחובבי מוטוריקה.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>10:00-14:00 (ב'-ו')</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>סופ"ש</div>
+                <div class="meta-item"><b>⏳ זמן</b>1.5 שעות</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/?api=1&query=Hellenic+Motor+Museum" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">מוזיאון המלחמה</span>
+                <span class="place-tag">היסטוריה</span>
+            </div>
+            <div class="info-text">
+                <p>המוזיאון סוקר את ההיסטוריה הצבאית של יוון מהתקופה העתיקה ועד ימינו. המבנה בולט בזכות המטוסים והתותחים המוצגים בחצר.</p>
+                <p>בפנים תמצאו אוסף עשיר של כלי נשק עתיקים, שריונות, חרבות, מדים וכלי נשק ממלחמות העולם.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item"><b>🕒 שעות</b>09:00-17:00</div>
+                <div class="meta-item"><b>💡 הכי טוב</b>צהריים</div>
+                <div class="meta-item"><b>⏳ זמן</b>1.5 שעות</div>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/?api=1&query=Athens+War+Museum" target="_blank" class="btn-small btn-nav">📍 ניווט</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="graffiti" class="section">
+    <div class="section-title">🎨 הקירות המדברים של אתונה</div>
+    
+    <div class="card">
+        <div class="graffiti-intro">
+            <b>למה אתונה היא בירת גרפיטי?</b>
+            <br>
+            אתונה היא לא רק עתיקות ושיש לבן; היא אחד ממוקדי הגרפיטי המרגשים בעולם. התופעה התפוצצה סביב המשבר הכלכלי של 2008, אז הפכו קירות העיר ל"עיתון של העם". אמנים מקומיים, שחשו ייאוש וכעס, יצאו לרחובות כדי לבטא את תחושותיהם. היום, הגרפיטי באתונה הוא שילוב מדהים של מחאה חברתית נוקבת, סמלים מהמיתולוגיה העתיקה, ותקווה לעתיד טוב יותר.
+            <br><br>
+            <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Louka+Nika/Sarri+St,+Athina/Plateia+Iroon/Evripidou/Paleologou,+Athina" target="_blank" class="btn-small btn-art">🗺️ פתח את כל המסלול במפה</a>
+        </div>
+
+        <div class="graffiti-step">
+            <div class="step-num">תחנה 1: הצעד הראשון (Louka Nika)</div>
+            <div class="graffiti-title">מ-Ermou לרחוב Louka Nika</div>
+            <div class="graffiti-text">
+                <p>נתחיל את הסיור מהמלון שלכם ברחוב Voulis 15. צאו לכיוון כיכר מונסטיראקי דרך רחוב Ermou. ברגע שתחצו את הכיכר ותיכנסו לרחוב Louka Nika, תרגישו את השינוי באווירה. אתם עוזבים את האזור התיירותי המצוחצח ונכנסים ללב הפועם של שכונת פסירי (Psiri).</p>
+                <p>רחוב זה הוא השער ל"גלריה הפתוחה" של אתונה. בעבר זה היה אזור של בתי מלאכה קטנים, אך המשבר הפך אותו לקנבס ענק. הביטו על הקירות הגבוהים: תראו כאן הרבה דמויות סוריאליסטיות, מעוותות מעט, בצבעים עזים. אלו יצירות שמבטאות את הבלבול והכאוס של החיים המודרניים בעיר גדולה, כחלק מתהליך הריפוי של הקהילה.</p>
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Louka+Nika+Athens" target="_blank" class="btn-small btn-nav">📍 נווט לנקודה זו</a>
+        </div>
+
+        <div class="graffiti-step">
+            <div class="step-num">תחנה 2: הגלריה הפתוחה (Sarri)</div>
+            <div class="graffiti-title">רחוב Sarri</div>
+            <div class="graffiti-text">
+                <p>המשיכו אל רחוב Sarri, שנחשב לאחד הרחובות החשובים ביותר בסצנת האמנות האורבנית. כאן תמצאו עבודות של האמן היווני המפורסם INO, שידוע בסגנון הריאליסטי שלו (שנראה כמו צילום שחור-לבן) עם "התזות" של צבע תכלת בוהק.</p>
+                <p>היצירות ברחוב הזה הן לא סתם ציורים יפים; הן ביקורת חריפה. חפשו ציורים של עיניים שעוקבות אחריכם, או דמויות שנראות כאילו הטכנולוגיה משתלטת עליהן. האמנים כאן מוחים נגד הקפיטליזם, נגד המעקב הממשלתי ונגד אובדן הפרטיות. הניגוד בין המבנים הניאו-קלאסיים הישנים והמתפוררים לבין האמנות המודרנית והנוקבת הוא מה שהופך את הרחוב הזה למרתק כל כך.</p>
+            </div>
+            <div class="food-spot">
+                🌭 <b>עצירת חובה: Sarri’s Souvlaki</b>
+                <br>בדיוק בנקודה הזו, עשו הפסקה קטנה בדוכן סופלקי קטן, צנוע ואותנטי להפליא. אין שולחנות מפוארים, רק הטעם האמיתי של אתונה.
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Sarri+Street+Athens" target="_blank" class="btn-small btn-nav">📍 נווט לנקודה זו</a>
+        </div>
+
+        <div class="graffiti-step">
+            <div class="step-num">תחנה 3: המיתולוגיה המודרנית</div>
+            <div class="graffiti-title">כיכר Iroon (כיכר הגיבורים)</div>
+            <div class="graffiti-text">
+                <p>הגעתם ללב של שכונת פסירי. כיכר הגיבורים היא מקום מפגש של סמטאות רבות, והיא מוקפת בבניינים גבוהים שמכוסים בציורי קיר מרשימים. זהו המקום להרים את הראש ולחפש את הפרטים הקטנים.</p>
+                <p>אחת היצירות המפורסמות באזור מציגה את ה"ינשוף" (או האוּח). במיתולוגיה היוונית, הינשוף הוא סמלה של האלה אתנה ומסמל חוכמה. אמני הרחוב משתמשים בסמל העתיק הזה כדי לנהל דיאלוג עם ההווה: לעיתים הינשוף נראה כועס, עצוב או מודאג. זהו ביטוי ויזואלי לשאלה: "האם אנחנו עדיין חכמים כמו אבותינו?", וניסיון לחבר בין העבר המפואר למציאות המורכבת של היום.</p>
+            </div>
+            <div class="food-spot">
+                🍕 <b>המלצה קולינרית: Feyrouz</b>
+                <br>בפינה הסמוכה נמצא "פיירוז", מקום משפחתי שמגיש אוכל רחוב לבנטיני (סורי-טורקי). הלחמג'ון (פיתה עם בשר) והפיינירלי (סירה עם גבינות) הם בגדר חובה.
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Plateia+Iroon+Athens" target="_blank" class="btn-small btn-nav">📍 נווט לנקודה זו</a>
+        </div>
+
+        <div class="graffiti-step">
+            <div class="step-num">תחנה 4: אמנות התריסים</div>
+            <div class="graffiti-title">רחוב Evripidou</div>
+            <div class="graffiti-text">
+                <p>עזבו את פסירי וצעדו לכיוון השוק המרכזי. רחוב אבריפידו הוא "רחוב התבלינים" של אתונה, והאמנות כאן שונה לגמרי. היא נקראת "Shutter Art" (אמנות תריסים). הציורים מצוירים על תריסי הברזל של החנויות, כך שהם מתגלים במלואם רק כשהחנויות סגורות.</p>
+                <p>בניגוד למחאה הפוליטית של פסירי, כאן הנושאים קשורים לשפע, לאוכל ולמסורת. תראו ציורים צבעוניים, שמחים יותר, שמתכתבים עם הריחות המשכרים של הקינמון, הפפריקה והנקניקים שתלויים בחלונות הראווה. זהו שילוב מושלם בין תרבות האוכל היוונית לבין האמנות העכשווית.</p>
+            </div>
+            <div class="food-spot">
+                🥓 <b>טעימה: Miran</b>
+                <br>מעדניית נקניקים מיתולוגית. היכנסו פנימה – הקירות והתקרה מכוסים בנקניקים מיובשים, והם ידועים בנדיבות שלהם בחלוקת טעימות של פסטרמה משובחת לעוברים ושבים.
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Evripidou+Street+Athens" target="_blank" class="btn-small btn-nav">📍 נווט לנקודה זו</a>
+        </div>
+
+        <div class="graffiti-step">
+            <div class="step-num">תחנה 5: ידע וחוכמה</div>
+            <div class="graffiti-title">שכונת מטקסורגיו</div>
+            <div class="graffiti-text">
+                <p>לסיום הסיור, חצו את הכביש הראשי לכיוון שכונת מטקסורגיו (אזור רחובות Paleologou). זהו אזור שהיה בעבר תעשייתי ומוזנח, וכיום עובר תהליך של התחדשות עירונית ("ג'נטריפיקציה") שמובילים אמנים צעירים.</p>
+                <p>גולת הכותרת כאן היא ציור הקיר הענק והמפורסם: ינשוף ענק עם הכיתוב (בתרגום מיוונית): <b>"ידע מדבר, אבל חוכמה מאזינה"</b>. היצירה הזו הפכה לאייקון של אתונה החדשה. היא מעבירה מסר של ענווה, הקשבה לזולת, ותקווה לעתיד טוב יותר שנבנה מתוך ההריסות. זהו המקום המושלם לסיים בו את הסיור, להצטלם למזכרת ולחשוב על הכוח של צבע לשנות מציאות.</p>
+            </div>
+            <div class="food-spot">
+                🥗 <b>סיום רגוע: Lux Athens</b>
+                <br>מקום נחמד לשבת בו למאזטים קלים, סלט יווני ומשקה קר בסוף הסיור הרגלי, לפני החזרה למלון.
+            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=Paleologou+Street+Athens" target="_blank" class="btn-small btn-nav">📍 נווט לנקודה זו</a>
+        </div>
+    </div>
+</div>
+
+<div id="food" class="section">
+    <div class="section-title">🍔 אוכל ובילוי</div>
+    
+    <div class="card filter-item" style="border: 2px solid var(--accent);">
+        <div class="list-item" style="background: #FFFaf0;">
+            <h3 style="margin:0 0 10px 0; color: #C05621;">🇬🇷 המילון הקולינרי: 15 מאכלים שחובה לטעום</h3>
+            <p style="font-size:0.9rem; color:#7B341E; margin-bottom:15px;">רשימת הצ'ק-ליסט שלכם לאתונה. אל תחזרו בלי לסמן V על הכל!</p>
+            
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">1. גירוס (Gyros)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">שווארמה יוונית (חזיר/עוף) בתוך פיתה עבה עם צ'יפס, עגבניה, בצל וצזיקי.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> O Thanasis או Savvas (מונסטיראקי) <a href="https://www.google.com/maps/search/?api=1&query=O+Thanasis" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">2. סופלאקי (Souvlaki)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">שיפודים צלויים על האש (קלאמקי) או בשר עטוף בפיתה. פשוט ומושלם.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Kostas (ליד סינטגמה) <a href="https://www.google.com/maps/search/?api=1&query=Kostas+Souvlaki+Agias+Eirinis" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">3. קולורי (Koulouri)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">בייגל יווני דק, פריך ומצופה בהמון שומשום. ארוחת הבוקר של המקומיים.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> To Koulouri tou Psirri (או דוכני רחוב בבוקר) <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Museum+of+Ancient+Greek+Technology/Varvakios+Market/Monastiraki+Square0" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">4. לוקומדס (Loukoumades)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">כדורי בצק מטוגנים (סופגניות ביס) טבולים בדבש וקינמון.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Krinos (הכי ותיק) או Lukumades (מודרני) <a href="https://www.google.com/maps/search/?api=1&query=Krinos+Athens" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">5. ספנקופיטה (Spanakopita)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">מאפה פילו פריך ממולא בתרד וגבינת פטה. המאפה הלאומי.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Ariston Bakery (ליד סינטגמה) <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Museum+of+Ancient+Greek+Technology/Varvakios+Market/Monastiraki+Square1" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">6. מוסקה (Moussaka)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">שכבות של חצילים, תפוחי אדמה, בשר טחון ורוטב בשאמל עשיר אפוי בתנור.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Maiandros (פלאקה) או Liondi <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Museum+of+Ancient+Greek+Technology/Varvakios+Market/Monastiraki+Square2" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">7. סגנאקי (Saganaki)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">גבינה קשה מטוגנת במחבת עד שהיא זהובה מבחוץ ונמסה מבפנים.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Karamanlidika (עם ריבת תאנים/נקניק) <a href="https://www.google.com/maps/search/?api=1&query=Karamanlidika+Athens" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">8. בורגאצה (Bougatsa)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">מאפה פילו חם ממולא בקרם סולת וניל (מתוק) או גבינה/בשר (מלוח).</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Bougatsadiko Psirri <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Museum+of+Ancient+Greek+Technology/Varvakios+Market/Monastiraki+Square3" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">9. סלט יווני (Horiatiki)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">האמיתי: עגבניות, מלפפון, בצל, זיתים וגוש פטה שלם (בלי חסה!).</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Diporto (הכי טרי ופשוט) <a href="https://www.google.com/maps/search/?api=1&query=Diporto+Agoras+Athens" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">10. דולמדס (Dolmades)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">עלי גפן ממולאים באורז ועשבי תיבול (ולפעמים בשר), מוגשים עם לימון.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Karamanlidika <a href="https://www.google.com/maps/search/?api=1&query=Karamanlidika+Athens" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">11. פבה (Fava)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">ממרח חלק מאפונה צהובה, מוגש חם/פושר עם שמן זית ובצל (מזכיר חומוס עדין).</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Oinomageireio Epirus (בשוק) <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Museum+of+Ancient+Greek+Technology/Varvakios+Market/Monastiraki+Square4" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">12. פסטיצ'יו (Pastitsio)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">"הלזניה היוונית" - פסטה צינורות ארוכים עם בשר טחון והמון רוטב בשאמל.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> טברנות מסורתיות (כמו Klimataria) <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Museum+of+Ancient+Greek+Technology/Varvakios+Market/Monastiraki+Square5" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">13. צזיקי (Tzatziki)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">המטבל הלאומי: יוגורט סמיך, מלפפונים מגורדים, שום ושמן זית.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> O Thanasis (עם פיתה חמה) <a href="https://www.google.com/maps/search/?api=1&query=O+Thanasis" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:15px; border-bottom:1px dashed #E2E8F0; padding-bottom:10px;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">14. קפה יווני (Ellinikos Kafes)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">קפה שחור חזק שמבושל בפינג'אן נחושת על חול חם (Hovoli).</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Mokka (ליד השוק) <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Museum+of+Ancient+Greek+Technology/Varvakios+Market/Monastiraki+Square6" style="text-decoration:none">🗺️</a></div>
+            </div>
+
+            <div style="margin-bottom:0; padding-bottom:0;">
+                <div style="font-weight:bold; font-size:1rem; color:#2D3748;">15. פטה עם דבש (Feta Me Meli)</div>
+                <div style="font-size:0.85rem; color:#4A5568;">גבינת פטה עטופה בבצק פילו, מטוגנת ומוגשת עם דבש ושומשום. שילוב מלוח-מתוק מושלם.</div>
+                <div class="food-rec-box"><b>📍 המלצה:</b> Eat at Milton's (או טברנות בפלאקה) <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Museum+of+Ancient+Greek+Technology/Varvakios+Market/Monastiraki+Square7" style="text-decoration:none">🗺️</a></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card filter-item">
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Overoll Croissanterie</span>
+                <span class="place-tag tag-must">מאפייה</span>
+            </div>
+            <div class="info-text">
+                <p>המאפייה הכי ויראלית באתונה, ובצדק. המקום מתמחה בקרואסונים בעבודת יד, שנאפים מול העיניים במטבח פתוח. הריח במקום משכר והתור בדרך כלל משתרך החוצה, אבל הוא מתקדם מהר.</p>
+                <p>חובה לטעום את <b>קרואסון הפיסטוק</b> המפורסם עם המילוי העשיר, או את קרואסון עוגת הגבינה והפטל. אם אתם מעדיפים מלוח, קרואסון התרד-גבינה שלהם הוא גרסה מודרנית ונהדרת לספנקופיטה.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Overoll+Croissanterie+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Little Kook</span>
+                <span class="place-tag tag-must">חוויה</span>
+            </div>
+            <div class="info-text">
+                <p>לא סתם בית קפה, אלא ממלכה של פנטזיה. המקום מפורסם בקישוטים המוגזמים והמושקעים שלו שמשתנים לפי העונה – ובדצמבר הם מגיעים לשיא עם תצוגת כריסטמס עוצרת נשימה שמשתלטת על רחוב שלם.</p>
+                <p>התפריט כולל עוגות ענק, קרפים מושחתים ושוקו חם עשיר. המחירים מעט גבוהים, אבל אתם משלמים על החוויה והאווירה הקסומה. מקום מושלם לתמונות ולספיגת אווירת חג.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Little+Kook+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Tylixto Greek Wrap</span>
+                <span class="place-tag tag-teen">סופלאקי</span>
+            </div>
+            <div class="info-text">
+                <p>גרסה מודרנית, נקייה וצבעונית לסופלקי המסורתי. המקום מעוצב ומזמין, והפיתות שלהם נחשבות לטריות ורכות במיוחד (נאפות במקום).</p>
+                <p>מומלץ לנסות את פיתת ה"גירוס" עוף או חזיר עם הרוטב הבית שלהם. זהו פתרון מעולה לארוחת צהריים מהירה וזולה במרכז העניינים, בלי להתפשר על איכות.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Tylixto+Greek+Wrap+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Hans & Gretel</span>
+                <span class="place-tag tag-teen">מתוקים</span>
+            </div>
+            <div class="info-text">
+                <p>חנות ממתקים שנראית כאילו יצאה מתוך אגדה מכושפת. העיצוב כולל מכשפה בכניסה ובית ממתקים צבעוני בפנים. הריח של סוכר וקינמון מושך אנשים מקילומטרים.</p>
+                <p>הלהיט כאן הוא ה"קיורטוש" (Chimney Cake) הממולא בגלידה ותוספות, וגם צמר גפן מתוק ענק בצורות שונות. מקום חלומי לילדים ולבני נוער (וגם להורים שאוהבים מתוק).</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Hans+and+Gretel+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">School Pizza Bar</span>
+                <span class="place-tag tag-teen">פיצה</span>
+            </div>
+            <div class="info-text">
+                <p>פיצריה ובר פופולריים בכיכר אגיה איריני התוססת. הקונספט העיצובי הוא של כיתת בית ספר נוסטלגית – עם מפות עולם, שולחנות כתיבה וספרים, אבל האווירה היא של מסיבה.</p>
+                <p>הפיצות דקות וקריספיות בסגנון איטלקי, והפסטות מצוינות. בערב המקום הופך לבר הומה עם מוזיקה טובה וקוקטיילים. מקום נהדר לסיים בו את היום.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=School+Pizza+Bar+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+        
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Karamanlidika</span>
+                <span class="place-tag tag-must">מעדניה</span>
+            </div>
+            <div class="info-text">
+                <p>לא סתם מסעדה, אלא חוויה קולינרית של "ביזנטיון פוגשת את קפדוקיה". המקום הוא מעדניית נקניקים וגבינות שמתפקדת גם כמסעדה. הישיבה היא סביב שולחנות בתוך המעדנייה עצמה.</p>
+                <p>התפריט מבוסס על מזטים קרים וחמים של נקניקים מיושנים (כמו פסטרמה וסודזוקי) וגבינות מיוחדות. חובה להזמין את ה"סגנאקי" (גבינה מטוגנת) עם ריבת תאנים או נקניק.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Karamanlidika+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">O Thanasis</span>
+                <span class="place-tag tag-food">קבב</span>
+            </div>
+            <div class="info-text">
+                <p>מוסד קולינרי ותיק בכיכר מונסטיראקי שתמיד מלא באנשים. המקום מפורסם בזכות השירות המהיר והיעיל והאווירה העממית והשמחה שלו.</p>
+                <p>מנת הדגל היא <b>"יוגורטלו"</b> (Yogurtlu) - קבב עסיסי המוגש על פיתה עם רוטב עגבניות עשיר ויוגורט יווני סמיך בצד. פשוט, משביע וטעים להפליא.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=O+Thanasis+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Melina Mercouri Café</span>
+                <span class="place-tag tag-food">קפה</span>
+            </div>
+            <div class="info-text">
+                <p>ביסטרו-קפה מקסים המוקדש לשחקנית והזמרת היווניה האגדית מלינה מרקורי. המקום מלא במזכרות ותמונות שלה, ומשרה אווירה נוסטלגית ואינטימית.</p>
+                <p>הוא ממוקם במיקום מושלם בפלאקה, ומציע אתנחתא נעימה. מומלץ מאוד להזמין את עוגת הלימון המפורסמת שלהם או יוגורט יווני עם דבש ואגוזים.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Melina+Mercouri+Cafe+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Diporto</span>
+                <span class="place-tag tag-food">אותנטי</span>
+            </div>
+            <div class="info-text">
+                <p>מסעדה מיתולוגית שהזמן עצר בה מלכת. מדובר במרתף (ללא שלט) ליד השוק המרכזי, עם חביות יין ענקיות ושולחנות עץ פשוטים. אין תפריט כתוב.</p>
+                <p>בעלי המקום מגישים את מה שבושל באותו יום – בדרך כלל מרק חומוס, שעועית, דגים מטוגנים קטנים וסלט יווני טרי. חוויה אותנטית וקשוחה לאוהבי הז'אנר.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Diporto+Agoras+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Hoocut</span>
+                <span class="place-tag tag-food">גורמה</span>
+            </div>
+            <div class="info-text">
+                <p>הניסיון המוצלח לקחת את הסופלאקי העממי ולהפוך אותו למנת שף מוקפדת. המקום הוקם על ידי חמישה שפים מובילים, והם אופים את הפיתות במקום ומשתמשים בבשר איכותי במיוחד.</p>
+                <p>התוצאה היא פיתה קטנה יותר אך עשירה בטעמים מדויקים. מומלץ לטעום את הקבב כבש או את העוף עם רוטב החרדל המיוחד שלהם.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Hoocut+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Lefteris o Politis</span>
+                <span class="place-tag tag-food">קבב</span>
+            </div>
+            <div class="info-text">
+                <p>מוסד קטן והיסטורי (קיים מאז 1951) שמגיש דבר אחד בלבד: קבב בפיתה. אין צ'יפס, אין סלט יווני, אין תפריט מגוון. רק קבב.</p>
+                <p>הקבב עשוי מתערובת בשר מתובלת היטב (פיקנטית מעט), עטוף בפיתה רכה עם עגבניה, בצל ופטרוזיליה. הפשטות היא סוד הקסם, והטעם נחשב לאחד הטובים באתונה.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Lefteris+o+Politis" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Nolan</span>
+                <span class="place-tag tag-food">פיוז'ן</span>
+            </div>
+            <div class="info-text">
+                <p>מסעדת פיוז'ן מודרנית ומדוברת של השף סוטיריס קונטיזאס (יווני-יפני). התפריט משלב בצורה גאונית חומרי גלם יווניים עם טכניקות וטעמים מהמזרח הרחוק.</p>
+                <p>המקום זכה בפרס "Bib Gourmand" של מישלן (אוכל מעולה במחיר סביר). המנות קטנות ונועדו לחלוקה. נסו את אטריות האורז או את העוף המטוגן המיוחד.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Nolan+Restaurant+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Baba Au Rum</span>
+                <span class="place-tag tag-food">בר</span>
+            </div>
+            <div class="info-text">
+                <p>אחד הברים המפורסמים בעולם (מדורג באופן קבוע ברשימות הטובים ביותר). המקום מתמחה, כפי ששמו מרמז, בקוקטיילים על בסיס רום איכותי.</p>
+                <p>האווירה בפנים טרופית, צבעונית ושמחה ("טיקי"), והברמנים הם אמנים של ממש. גם אם אתם לא חובבי רום, תמצאו כאן משקאות יצירתיים וטעימים.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Baba+Au+Rum" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Taf Coffee</span>
+                <span class="place-tag tag-food">קפה</span>
+            </div>
+            <div class="info-text">
+                <p>מקדש לאוהבי קפה אמיתיים. בית הקלייה הזה נחשב לאחד הטובים ביוון ומוביל את סצנת "הגל השלישי" של הקפה באתונה.</p>
+                <p>המקום עצמו הוא פנינה נסתרת עם חצר פנימית מקורה ומעוצבת בסגנון תעשייתי. הבריסטות מקצועיים מאוד וישמחו להמליץ לכם על פולים ממקומות אקזוטיים בעולם.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Taf+Coffee+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Couleur Locale</span>
+                <span class="place-tag tag-food">רופטופ</span>
+            </div>
+            <div class="info-text">
+                <p>בר גג נסתר ומגניב במונסטיראקי. הכניסה היא דרך פסאז' עתיק ומעלית נחבאת, אבל כשדלתות המעלית נפתחות בקומה העליונה – הנוף מדהים.</p>
+                <p>הבר משקיף ישירות על גבעת האקרופוליס (שמוארת יפה בלילה) ומציע אווירה צעירה, קוקטיילים טובים ומוזיקה נעימה. מקום מושלם לדרינק של ערב.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Couleur+Locale+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Da Vinci Gelato</span>
+                <span class="place-tag tag-food">גלידה</span>
+            </div>
+            <div class="info-text">
+                <p>גלידרייה איטלקית משובחת בלב האזור התיירותי. קל לזהות את המקום לפי התור בכניסה ולפי הריח של הוופל הטרי.</p>
+                <p>הגימיק (והטעם) שלהם הוא טבילת גביע הגלידה בשוקולד חם וציפויו באגוזים או סוכריות לפני הוספת הכדורים. הטעמים עשירים וקרמיים מאוד.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Da+Vinci+Gelato+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Estrella</span>
+                <span class="place-tag tag-food">בראנץ'</span>
+            </div>
+            <div class="info-text">
+                <p>רשת בראנץ' מסלוניקי שכבשה את אתונה. המקום מפורסם בזכות המצאה אחת גאונית: ה"בורגאצן" (Bougatsan).</p>
+                <p>זהו שילוב מושחת בין קרואסון לבין בורגאצה (מאפה קרם סולת יווני), המוגש עם קרם וניל חם וקינמון. יש גם מנות ביצים מצוינות ופנקייקים ענקיים.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Estrella+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Savvas</span>
+                <span class="place-tag tag-food">בשרים</span>
+            </div>
+            <div class="info-text">
+                <p>מסעדה גדולה ותיירותית (במובן הטוב) בכיכר מונסטיראקי. היתרון הגדול שלה הוא המרפסת העליונה (Roof Garden) שמשקיפה על הכיכר ועל האקרופוליס.</p>
+                <p>התפריט כולל את כל הקלאסיקות: קבב, ג'ירוס, סלטים ומזטים. מקום נוח מאוד למשפחות שרוצות ארוחה בטוחה וטעימה עם נוף.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Savvas+Monastiraki" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Kostas Souvlaki</span>
+                <span class="place-tag tag-food">רחוב</span>
+            </div>
+            <div class="info-text">
+                <p>דוכן סופלקי מיתולוגי וזעיר ליד כיכר אגיה איריני. קוסטאס מכין סופלקי בסגנון ישן וקפדני כבר עשרות שנים.</p>
+                <p>הבשר עסיסי, הפיתה לא שמנונית, והרוטב האדום הסודי שלו עושה את כל ההבדל. שימו לב: הוא נסגר ברגע שהבשר נגמר (לרוב סביב 15:00-16:00), אז הגיעו מוקדם.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Kostas+Souvlaki+Agias+Eirinis" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+
+        <div class="list-item">
+            <div class="list-header">
+                <span class="place-name">Krinos</span>
+                <span class="place-tag tag-food">מתוק</span>
+            </div>
+            <div class="info-text">
+                <p>בית קפה היסטורי שקיים מאז 1923 וממוקם בבניין ניאו-קלאסי ישן ברחוב Aiolou. זהו המקום בה"א הידיעה לאכול בו <b>לוקומדס</b> (סופגניות יווניות).</p>
+                <p>הסופגניות כאן הן בצורת טבעת (ולא כדור), מטוגנות טריות ומוגשות באופן מסורתי עם דבש, קינמון ואגוזים כתושים. חוויה של פעם.</p>
+            </div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Krinos+Athens" target="_blank" class="btn-small btn-nav">📍 ניווט</a></div>
+        </div>
+    </div>
+</div>
+
+<div id="tips" class="section">
+    <div class="section-title">💡 מידע וטיפים</div>
+
+    <div class="card filter-item">
+        <div class="accordion-header">
+            <span>🚕 תחבורה והתניידות</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="accordion-content open">
+            <ul class="tip-list">
+                <li><span class="tip-highlight">מוניות:</span> השתמשו רק באפליקציות <b>Uber</b> או <b>Freenow</b>. הן מזמינות מוניות צהובות רגילות אך המחיר ידוע מראש ומונע הפקעות.</li>
+                <li><span class="tip-highlight">מטרו:</span> התחנה שלכם היא Syntagma. כרטיס יומי: 4.10€, כרטיס ל-5 ימים: 8.20€.</li>
+                <li><span class="tip-highlight">שדה תעופה:</span> דורש כרטיס מיוחד למטרו (9€ לאדם).</li>
+                <li><span class="tip-highlight">הליכה:</span> המלון שלכם מרכזי מאוד. לרוב האתרים (פלאקה, מונסטיראקי) אפשר להגיע ברגל.</li>
+            </ul>
+            <div class="btn-row">
+                <a href="https://www.cieca.eu/sites/default/files/public-pages/Events/2022TAGworkshop/athens-metro-map-pdf.pdf" target="_blank" class="btn-small btn-web">🗺️ הורד מפת מטרו (PDF)</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card filter-item">
+        <div class="accordion-header">
+            <span>🛍️ שופינג ושווקים</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+            <ul class="tip-list">
+                <li><span class="tip-highlight">Ermou:</span> מדרחוב המותגים הראשי (ZARA, H&M, Mango). קרוב למלון.</li>
+                <li><span class="tip-highlight">Monastiraki:</span> שוק הפשפשים. פתוח כל יום, אך ביום ראשון הוא הגדול ביותר. וינטג', תקליטים ומזכרות.</li>
+                <li><span class="tip-highlight">Kolonaki:</span> שכונת יוקרה עם מותגי על ובוטיקים.</li>
+                <li><span class="tip-highlight">Jumbo:</span> חנות "מקס סטוק" ענקית וזולה בטירוף (יש סניף ליד כיכר Omonia).</li>
+                <li><span class="tip-highlight">Attica:</span> בית כלבו יוקרתי בתוך בניין בכיכר סינטגמה (כמו המשביר אבל יוקרתי).</li>
+                <li><span class="tip-highlight">החזרי מס:</span> בקנייה מעל 50€ בחנות אחת, בקשו טופס Tax Free.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card filter-item">
+        <div class="accordion-header">
+            <span>❄️ חורף, כסף ובטיחות</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+            <ul class="tip-list">
+                <li><span class="tip-highlight">לבוש:</span> שיטת הבצל. בחוץ קר וגשום, בפנים (חנויות/מוזיאונים) מחומם מאוד. חובה מעיל גשם ומטריה.</li>
+                <li><span class="tip-highlight">כייסים:</span> אתונה בטוחה, אבל מכת הכייסים במטרו ובמקומות צפופים היא אמיתית. שימו תיק מקדימה.</li>
+                <li><span class="tip-highlight">טיפים:</span> נהוג להשאיר 10% במסעדות אם השירות טוב.</li>
+                <li><span class="tip-highlight">ארוחת ערב:</span> היוונים אוכלים מאוחר. מסעדות מתמלאות ב-21:00-22:00.</li>
+                <li><span class="tip-highlight">יום ראשון חינם:</span> ב-7/12 הכניסה לאתרים ארכיאולוגיים (אקרופוליס, אגורה) חינם.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card filter-item">
+        <div class="accordion-header">
+            <span>🍸 חיי לילה וברים</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+            <ul class="tip-list">
+                <li><b>Noel:</b> בר יפהפה המקושט באווירת חג כל השנה.</li>
+                <li><b>The Clumsies:</b> קוקטיילים ברמה עולמית (ב-50 הטובים בעולם).</li>
+                <li><b>A for Athens:</b> רופטופ עם הנוף הכי טוב לאקרופוליס.</li>
+                <li><b>Brettos:</b> הבר העתיק והצבעוני בפלאקה.</li>
+                <li><b>Jazz in Jazz:</b> בר ג'אז אינטימי ומיוחד בקולונקי.</li>
+                <li><b>Six D.O.G.S:</b> בר עם גינה נסתרת ומגניבה.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="maps" class="section">
+    <div class="section-title">🗺️ מרכז המפות</div>
+    
+    <div class="card filter-item">
+        <div class="list-item" style="background: #EBF8FF;">
+            <div class="list-header"><span class="place-name">🏨 המלון והמטרו</span></div>
+            <div class="btn-row"><a href="https://www.google.com/maps/search/?api=1&query=Voulis+15+Athens" target="_blank" class="btn-small btn-nav">📍 נווט למלון</a></div>
+            <div class="btn-row"><a href="https://www.cieca.eu/sites/default/files/public-pages/Events/2022TAGworkshop/athens-metro-map-pdf.pdf" target="_blank" class="btn-small btn-web">📥 הורד מפת מטרו (PDF)</a></div>
+        </div>
+    </div>
+
+    <div class="card filter-item">
+        <div class="list-item">
+            <div class="list-header"><span class="place-name">📅 מסלולים יומיים</span></div>
+            <span class="desc">קיצורי דרך למסלולי הליכה בגוגל מפות:</span>
+            <div class="btn-row" style="flex-wrap:wrap;">
+                <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Syntagma+Square/Ermou/Little+Kook,+Karaiskaki+17" target="_blank" class="btn-small btn-nav" style="flex: 1 0 45%;">יום 1: מרכז ופסירי</a>
+                <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Museum+of+Ancient+Greek+Technology/Varvakios+Agora/Monastiraki+Square/National+Garden/Museum+of+Illusions+Athens" target="_blank" class="btn-small btn-nav" style="flex: 1 0 45%;">יום 2: שווקים וטכנולוגיה</a>
+                <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Anafiotika/Lycabettus+Hill/Stavros+Niarchos+Foundation+Cultural+Center" target="_blank" class="btn-small btn-nav" style="flex: 1 0 45%;">יום 3: פלאקה ו-SNFCC</a>
+                <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Acropolis+of+Athens/Syntagma+Square/Acropolis+Museum/Monastiraki" target="_blank" class="btn-small btn-nav" style="flex: 1 0 45%;">יום 4: אקרופוליס והיסטוריה</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card filter-item">
+        <div class="list-item">
+            <div class="list-header"><span class="place-name">🎨 מפות מיוחדות</span></div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/dir/Voulis+15,+Athina/Louka+Nika/Sarri+St,+Athina/Plateia+Iroon/Evripidou/Paleologou,+Athina" target="_blank" class="btn-small btn-art">📍 מפת סיור גרפיטי (מהמלון)</a>
+            </div>
+            <div class="btn-row">
+                <a href="https://www.google.com/maps/search/shopping+near+Ermou,+Athens" target="_blank" class="btn-small btn-nav">🛍️ מפת אזורי שופינג (Ermou)</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="navbar">
+    <button class="nav-btn active" data-target="schedule">
+        <span class="nav-icon">📅</span>
+        <span>לו"ז</span>
+    </button>
+    <button class="nav-btn" data-target="attractions">
+        <span class="nav-icon">🎡</span>
+        <span>אתרים</span>
+    </button>
+    <button class="nav-btn" data-target="graffiti">
+        <span class="nav-icon">🎨</span>
+        <span>גרפיטי</span>
+    </button>
+    <button class="nav-btn" data-target="food">
+        <span class="nav-icon">🍔</span>
+        <span>אוכל</span>
+    </button>
+    <button class="nav-btn" data-target="tips">
+        <span class="nav-icon">💡</span>
+        <span>טיפים</span>
+    </button>
+    <button class="nav-btn" data-target="maps">
+        <span class="nav-icon">🗺️</span>
+        <span>מפות</span>
+    </button>
+</div>
+
+<script>
+    // JS מותאם לאייפון: מחכה לטעינה מלאה לפני חיבור כפתורים
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- 1. TABS LOGIC (SAFE METHOD) ---
+        const navBtns = document.querySelectorAll('.nav-btn');
+        
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault(); // מונע התנהגות ברירת מחדל
+                
+                const targetId = this.getAttribute('data-target');
+                
+                // הסתרת כל הסקשנים
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                // הסרת סימון מכל הכפתורים
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                
+                // הצגת הסקשן הנבחר
+                const targetSection = document.getElementById(targetId);
+                if(targetSection) targetSection.classList.add('active');
+                
+                // סימון הכפתור שנלחץ
+                this.classList.add('active');
+                
+                // איפוס חיפוש וגלילה
+                const search = document.getElementById('searchInput');
+                if(search) search.value = "";
+                document.querySelectorAll('.filter-item').forEach(i => i.style.display = "block");
+                window.scrollTo(0,0);
+            });
+        });
+
+        // --- 2. ACCORDION LOGIC ---
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('.toggle-icon');
+                
+                if (content.classList.contains('open')) {
+                    content.classList.remove('open');
+                    if(icon) icon.innerText = "▼";
+                } else {
+                    content.classList.add('open');
+                    if(icon) icon.innerText = "▲";
+                }
+            });
+        });
+
+        // --- 3. SEARCH LOGIC ---
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const filter = this.value.toLowerCase();
+                const items = document.querySelectorAll('.filter-item');
+                
+                items.forEach(item => {
+                    const text = item.innerText.toLowerCase();
+                    item.style.display = text.includes(filter) ? "block" : "none";
+                });
+            });
+        }
+
+        // --- 4. CHART LOGIC (FAIL-SAFE) ---
+        // עטוף ב-try/catch כדי שאם הגרף נכשל, שאר האתר לא ייתקע
+        try {
+            const ctx = document.getElementById('walkingChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['חמישי', 'שישי', 'שבת', 'ראשון'],
+                        datasets: [{
+                            label: 'ק"מ הליכה (משוער)',
+                            data: [4.5, 6.0, 5.5, 6.5],
+                            backgroundColor: [
+                                'rgba(44, 82, 130, 0.6)',
+                                'rgba(237, 137, 54, 0.6)',
+                                'rgba(44, 82, 130, 0.6)',
+                                'rgba(237, 137, 54, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(44, 82, 130, 1)',
+                                'rgba(237, 137, 54, 1)',
+                                'rgba(44, 82, 130, 1)',
+                                'rgba(237, 137, 54, 1)'
+                            ],
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: false, // ביטול אנימציה לשיפור ביצועים באייפון ישן
+                        scales: {
+                            y: { beginAtZero: true, grid: { display: false } },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        } catch (e) {
+            console.log("Chart failed to load, continuing...");
+        }
+    });
+</script>
+
+</body>
+</html>
